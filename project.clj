@@ -7,5 +7,5 @@
   :plugins [[lein-cljsbuild "0.3.0"]]
   :cljsbuild {:builds [{:source-paths ["src/cljs"]
                         :compiler {:optimizations :none
-                                   :output-to "resources/public/deps.js"
+                                   :output-to "resources/public/build/deps.js"
                                    :output-dir "resources/public/build"}}]})
