@@ -1,4 +1,6 @@
-(defn obj
+(ns boids.3d.view)
+
+ (defn obj
   "Convert a cljs map to a Clojure map"
   [m]
   (let [out (js-obj)]
