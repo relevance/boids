@@ -1,6 +1,17 @@
 <html>
   <head><title>Hello, World!</title></head>
+  <style>
+    #framerate {
+      color: white;
+      background-color: black;
+      z-index: 1;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+  </style>
   <body>
+    <div id="framerate"></div>
     <script src="build/goog/base.js"></script>
     <script src="build/deps.js"></script>
     <script>goog.require('boids.main');</script>
