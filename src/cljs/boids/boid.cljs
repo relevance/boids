@@ -8,6 +8,23 @@
     (swap! id inc)
     @id))
 
+(defn separation
+  "Returns a heading adjusted for separation"
+  [heading position geometry other-boids]
+  (let [avg (p/average geometry (map p/position other-boids))
+        new-heading (p/towards geometry position avg)]
+    new-heading))
+
+(defn cohesion
+  "Returns a heading adjusted for cohesion"
+  [heading position geometry other-boids]
+  heading)
+
+(defn alignment
+  "Returns a heading adjusted for alignment"
+  [heading position geometry other-boids]
+  heading)
+
 (defrecord NormalBoid [id position heading]
   p/Boid
   (id [_] id)
@@ -17,8 +34,12 @@
     (assoc this :position position :heading heading))
   p/Behavior
   (steer [_ geometry boids boid]
-    ;; Bad - not agnostic to what a heading actually is
-    (+ (p/heading boid) 0.05)))
+    (let [position (p/position boid)
+          other-boids (filter #(not (= % boid)) boids)]
+      (-> (p/heading boid)
+          (separation position geometry other-boids)
+          (cohesion position geometry other-boids)
+          (alignment position geometry other-boids)))))
 
 (defn create
   "Returns a NormalBoid at a random position and heading on the given

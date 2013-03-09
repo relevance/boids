@@ -4,7 +4,7 @@
             [boids.boid :as b]
             [boids.view2d :as v]))
 
-(def num-boids 10)
+(def num-boids 100)
 
 (def speed 5)
 
@@ -59,7 +59,7 @@
   (count-frame)
   (requestAnimationFrame #(tick geometry boids-atom)))
 
-(defn main
+(defn ^:export main
   "Starts everything running"
   []
   (let [geometry (g/->Geometry2D (.-innerWidth js/window)
@@ -69,3 +69,4 @@
     (p/initialize view (.-body js/document) boids-atom)
     (report-fps)
     (tick geometry boids-atom)))
+

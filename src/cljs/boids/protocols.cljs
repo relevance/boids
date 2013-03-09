@@ -6,6 +6,12 @@
     "Given a position, heading and speed, return an updated position")
   (distance [this position-1 position-2]
     "Returns the distance between two positions")
+  (average [this positions]
+    "Given a sequence of positions, return a position that is its
+    average.")
+  (towards [this p1 p2]
+    "Given two positions, return a heading from the first to the
+    second.")
   (random-position [this]
     "Returns a random position")
   (random-heading [this]
@@ -34,5 +40,4 @@
     "Initializes a view, rendering it to the given DOM element. Also
     takes an atom containing a collection of boids; the view should
     re-render whenever the atom changes."))
-
 
