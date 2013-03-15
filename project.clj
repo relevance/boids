@@ -5,7 +5,8 @@
   :source-paths ["src/clj"]
   :main boids.server
   :plugins [[lein-cljsbuild "0.3.0"]]
-  :cljsbuild {:builds [{:source-paths ["src/cljs"]
+  :cljsbuild {:crossovers [boids.behaviors]
+              :builds [{:source-paths ["src/cljs"]
                         :compiler {:optimizations :none
                                    :output-to "resources/public/build/deps.js"
                                    :output-dir "resources/public/build"}}]})

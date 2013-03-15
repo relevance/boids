@@ -25,7 +25,7 @@
   (div [this scalar]
     (mapv #(/ % scalar) this))
   (magnitude [this]
-    (Math/sqrt (reduce cljs.core/+ (map #(Math/pow % 2) this))))
+    (Math/sqrt (reduce + (map #(Math/pow % 2) this))))
   (distance [this vector]
     (magnitude (sub this vector)))
   (scale [this scalar]

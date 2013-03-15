@@ -56,11 +56,11 @@
 
 (defn init
   "Given an atom containing a seq of boids, initialize the view"
-  [boids]
+  [flock-atom]
   (let [canvas (.createElement js/document "canvas")]
     (.setAttribute canvas "width" (.-innerWidth js/window))
     (.setAttribute canvas "height" (.-innerHeight js/window))
     (.appendChild (.-body js/document) canvas)
-    (add-watch boids :renderer (fn [_ _ _ boids]
-                                 (render canvas boids)))
-    (init-fps-monitor boids)))
+    (add-watch flock-atom :renderer (fn [_ _ _ flock]
+                                      (render canvas flock)))
+    (init-fps-monitor flock-atom)))

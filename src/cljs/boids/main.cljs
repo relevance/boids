@@ -3,27 +3,38 @@
             [boids.view :as view]
             [boids.behaviors :as behaviors]))
 
+;; A boid consists of a position and a velocity (both EuclideanVectors)
+(defrecord Boid [pos vel])
+
 (def num-boids 10)
+
+(def default-options {:steer-force 0.1
+                      :max-speed 6
+                      :cohere-distance 300
+                      :avoid-distance 50
+                      :align-distance 200
+                      :goal [(/ (.-innerWidth js/window) 2)
+                             (/ (.-innerHeight js/window) 2)]})
 
 (defn create-boid
   "Returns a new boid with a random position on the screen."
   []
-  {:pos [(rand-int (.-innerWidth js/window))
-         (rand-int (.-innerHeight js/window))]
-   :vel [0 0]})
+  (map->Boid {:pos [(rand-int (.-innerWidth js/window))
+                    (rand-int (.-innerHeight js/window))]
+              :vel [0 0]}))
 
 ;; Behaviors and weights
-(def behaviors { behaviors/cohesion 1
+(def behaviors { behaviors/cohesion  1
                  behaviors/avoidance 1
                  behaviors/alignment 1
-                 behaviors/goal 1})
+                 behaviors/goal      1 })
 
 (defn update-boid
-  "Given a collection containing the flock, and an individual boid,
-  return an updated boid."
-  [boid flock]
+  "Given a collection containing the flock and an individual boid,
+  return an updated boid, using the provided options atom."
+  [options-atom boid flock]
   (let [accelerations (map (fn [[behavior weight]]
-                             (v/mul (behavior boid flock) weight))
+                             (v/mul (behavior @options-atom boid flock) weight))
                            behaviors)
         velocity (v/limit (reduce v/add (:vel boid) accelerations) behaviors/max-speed)]
     {:pos (v/add (:pos boid) velocity)
@@ -31,8 +42,8 @@
 
 (defn update-flock
   "Given a flock (a collection of boids), return an updated flock"
-  [flock]
-  (map #(update-boid % flock) flock))
+  [options-atom flock]
+  (map #(update-boid options-atom % flock) flock))
 
 (defn requestAnimationFrame
   "Cross-browser wrapper for requestAnimationFrame"
@@ -46,15 +57,16 @@
    (.mozRequestAnimationFrame js/window callback)))
 
 (defn tick
-  "Execute one frame of the simulation"
-  [flock-atom]
-  (swap! flock-atom update-flock)
-  (requestAnimationFrame #(tick flock-atom)))
+  "The main 'loop' of the simulation."
+  [options-atom flock-atom]
+  (swap! flock-atom (partial update-flock options-atom))
+  (requestAnimationFrame #(tick options-atom flock-atom)))
 
 (defn main
   "Starts everything running"
   []
-  (let [flock-atom (atom (repeatedly num-boids #(create-boid)))]
+  (let [options-atom (atom default-options)
+        flock-atom (atom (repeatedly num-boids #(create-boid)))]
     (view/init flock-atom)
-    (tick flock-atom)))
+    (tick options-atom flock-atom)))
 
