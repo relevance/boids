@@ -3,7 +3,7 @@
             [boids.view :as view]
             [boids.behaviors :as behaviors]))
 
-(def num-boids 20)
+(def num-boids 15)
 
 (defn create-boid
   "Returns a new boid with a random position on the screen."
@@ -14,8 +14,9 @@
 
 ;; Behaviors and weights
 (def behaviors { behaviors/cohesion 1
-                 behaviors/avoidance 1
-                 behaviors/alignment 1 })
+                 behaviors/avoidance 1.5
+                 behaviors/alignment 1
+                 behaviors/goal 0.8})
 
 (defn update-boid
   "Given a collection containing the flock, and an individual boid,

@@ -67,3 +67,24 @@
             dir (v/scale avg max-speed)
             steer (v/sub dir (:vel boid))]
         (v/limit steer max-force)))))
+
+(defn alignment
+  "An acceleration for a boid representing the way a flock aligns
+  velocities."
+  [boid flock]
+  (let [align-with (nearby boid flock align-distance)]
+    (if (zero? (count align-with))
+      (v/zero (:pos boid))
+      (let [s (reduce v/add (map :vel flock))
+            avg (v/div s (count flock))
+            dir (v/scale avg max-speed)
+            steer (v/sub dir (:vel boid))]
+        (v/limit steer max-force)))))
+
+(defn goal
+  "An acceleration towards a specific point"
+  [boid flock]
+  (let [origin [(/ (.-innerWidth js/window) 2)
+                (/ (.-innerHeight js/window) 2)]
+        d (v/distance (:pos boid) origin)]
+    (seek (:pos boid) origin)))
