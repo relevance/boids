@@ -51,7 +51,7 @@
   (swap! flock-atom update-flock)
   (requestAnimationFrame #(tick flock-atom)))
 
-(defn ^:export main
+(defn main
   "Starts everything running"
   []
   (let [flock-atom (atom (repeatedly num-boids #(create-boid)))]

@@ -1,13 +1,9 @@
 # boids
 
-A Clojure library designed to ... well, that part is up to you.
+Sample flocking simulation in ClojureScript
 
 ## Usage
 
-FIXME
-
-## License
-
-Copyright © 2013 FIXME
-
-Distributed under the Eclipse Public License, the same as Clojure.
+1. Run `lein run` to start the server.
+2. In another shell, run `lein cljsbuild auto` to build ClojureScript.
+3. Open `localhost:300/main.html` in a browser to see the app.
