@@ -1,45 +1,69 @@
 (ns boids.behaviors
-  (:require [boids.protocols :as p]))
+  (:require [boids.euclidean-vector :as v]))
 
-(def cohesion
-  (reify p/Behavior
-    (delta-v [_ boid neighbors]
-      (let [center (p/divide (reduce p/add (map :position neighbors))
-                             (count neighbors))]
-        (p/divide (p/subtract center (:position boid))
-                  100)))))
+(def max-force 0.1)
+(def max-speed 4)
 
+(def cohere-distance 300)
 (def avoid-distance 50)
+(def align-distance 100)
 
-(def avoidance
-  (reify p/Behavior
-    (delta-v [_ boid neighbors]
-      (let [near-neighbors (filter #(< (p/magnitude (p/subtract (:position %)
-                                                                (:position boid)))
-                                       avoid-distance)
-                                   neighbors)]
-        (if (< 0 (count near-neighbors))
-          (let [center (p/divide (reduce p/add (map :position near-neighbors))
-                                 (count near-neighbors))]
-            (p/divide (p/subtract center (:position boid)) -75))
-          (p/zero (:velocity boid)))))))
+(defn seek
+  "Return a vector pointing from the source to the target, limited by
+  the steer force."
+  [source target]
+  (-> (v/sub target source)
+      (v/scale max-speed)
+      (v/limit max-force)))
 
-#_(def avoidance
-  (reify p/Behavior
-    (delta-v [_ boid neighbors]
-      (reduce (fn [v b]
-                (let [offset (p/subtract (:position boid) (:position b))
-                      distance (p/magnitude offset)]
-                  (if (< distance avoid-distance)
-                    (p/subtract v offset)
-                    v)))
-              (p/zero (:velocity boid))
-              neighbors))))
+(defn nearby
+  "Given a boid and a flock, return a collection of the boids within a
+  certain distance of the boid, not including the boid itself."
+  [boid flock dist]
+  (filter #(and (< (v/distance (:pos %) (:pos boid)) dist)
+                (not= % boid)) flock))
 
-(def alignment
-  (reify p/Behavior
-    (delta-v [_ boid neighbors]
-      (let [pv (p/divide (reduce p/add (map :velocity neighbors))
-                         (count neighbors))]
-        (p/divide (p/subtract pv (:velocity boid))
-                  4)))))
+(defn cohesion
+  "An acceleration for a boid representing flock cohesion."
+  [boid flock]
+  (let [cohere-with (nearby boid flock cohere-distance)]
+    (if (zero? (count cohere-with))
+      (v/zero (:pos boid))
+      (let [center (v/div (reduce v/add (map :pos cohere-with))
+                          (count cohere-with))]
+        (seek (:pos boid) center)))))
+
+(defn avoidance
+  "An acceleration for a boid representing avoidance of neighbors."
+  [boid flock]
+  (let [avoid (nearby boid flock avoid-distance)]
+    (if (zero? (count avoid))
+      (v/zero (:pos boid))
+      (let [steer (reduce (fn [steer pos]
+                            (-> (v/sub (:pos boid) pos)
+                                (v/scale 1)
+                                (v/add steer)))
+                          (v/zero (:pos boid))
+                          (map :pos avoid))
+            steer2 (if (< 0 (count avoid))
+                     (v/div steer (count avoid))
+                     steer)]
+        (if (< 0 (v/magnitude steer2))
+          (-> steer2
+              (v/scale max-speed)
+              (v/sub (:vel boid))
+              (v/limit max-force))
+          steer2)))))
+
+(defn alignment
+  "An acceleration for a boid representing the way a flock aligns
+  velocities."
+  [boid flock]
+  (let [align-with (nearby boid flock align-distance)]
+    (if (zero? (count align-with))
+      (v/zero (:pos boid))
+      (let [s (reduce v/add (map :vel flock))
+            avg (v/div s (count flock))
+            dir (v/scale avg max-speed)
+            steer (v/sub dir (:vel boid))]
+        (v/limit steer max-force)))))

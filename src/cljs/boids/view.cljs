@@ -37,8 +37,8 @@
 (defn render-boid
   "Renders a boid, complete with placement and rotation"
   [ctx boid]
-  (let [[x y] (:position boid)
-        [dx dy] (:velocity boid)
+  (let [[x y] (:pos boid)
+        [dx dy] (:vel boid)
         angle (Math/atan2 dy dx)]
     (.save ctx)
     (.translate ctx x y)
