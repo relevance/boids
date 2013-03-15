@@ -3,13 +3,13 @@
             [boids.view :as view]
             [boids.behaviors :as behaviors]))
 
-(def num-boids 15)
+(def num-boids 10)
 
 (defn create-boid
   "Returns a new boid with a random position on the screen."
   []
   {:pos [(rand-int (.-innerWidth js/window))
-              (rand-int (.-innerHeight js/window))]
+         (rand-int (.-innerHeight js/window))]
    :vel [0 0]})
 
 ;; Behaviors and weights

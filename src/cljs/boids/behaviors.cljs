@@ -1,7 +1,7 @@
 (ns boids.behaviors
   (:require [boids.euclidean-vector :as v]))
 
-(def max-force 0.3)
+(def steer-force 0.1)
 (def max-speed 6)
 
 (def cohere-distance 300)
@@ -12,8 +12,7 @@
   "Return a vector pointing from the source to the target, limited by
   the maximum force"
   [source target]
-  (-> (v/sub target source)
-      (v/limit max-force)))
+  (v/limit (v/sub target source) steer-force))
 
 (defn nearby
   "Given a boid and a flock, return a collection of the boids within a
@@ -44,7 +43,7 @@
                                     (v/add steer)))
                               (v/zero (:pos boid))
                               (map :pos avoid))]
-        (v/limit direction max-force)))))
+        (v/limit direction steer-force)))))
 
 
 (defn alignment
@@ -58,7 +57,7 @@
             avg (v/div s (count flock))
             dir (v/scale avg max-speed)
             steer (v/sub dir (:vel boid))]
-        (v/limit steer max-force)))))
+        (v/limit steer steer-force)))))
 
 (defn goal
   "An acceleration towards a specific point"
