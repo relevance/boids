@@ -14,9 +14,9 @@
 
 ;; Behaviors and weights
 (def behaviors { behaviors/cohesion 1
-                 behaviors/avoidance 1.5
+                 behaviors/avoidance 1
                  behaviors/alignment 1
-                 behaviors/goal 0.8})
+                 behaviors/goal 1})
 
 (defn update-boid
   "Given a collection containing the flock, and an individual boid,

@@ -1,19 +1,18 @@
 (ns boids.behaviors
   (:require [boids.euclidean-vector :as v]))
 
-(def max-force 0.1)
-(def max-speed 4)
+(def max-force 0.3)
+(def max-speed 6)
 
 (def cohere-distance 300)
 (def avoid-distance 50)
-(def align-distance 100)
+(def align-distance 200)
 
 (defn seek
   "Return a vector pointing from the source to the target, limited by
-  the steer force."
+  the maximum force"
   [source target]
   (-> (v/sub target source)
-      (v/scale max-speed)
       (v/limit max-force)))
 
 (defn nearby
@@ -39,34 +38,14 @@
   (let [avoid (nearby boid flock avoid-distance)]
     (if (zero? (count avoid))
       (v/zero (:pos boid))
-      (let [steer (reduce (fn [steer pos]
-                            (-> (v/sub (:pos boid) pos)
-                                (v/scale 1)
-                                (v/add steer)))
-                          (v/zero (:pos boid))
-                          (map :pos avoid))
-            steer2 (if (< 0 (count avoid))
-                     (v/div steer (count avoid))
-                     steer)]
-        (if (< 0 (v/magnitude steer2))
-          (-> steer2
-              (v/scale max-speed)
-              (v/sub (:vel boid))
-              (v/limit max-force))
-          steer2)))))
+      (let [direction (reduce (fn [steer pos]
+                                (-> (v/sub (:pos boid) pos)
+                                    (v/scale 1)
+                                    (v/add steer)))
+                              (v/zero (:pos boid))
+                              (map :pos avoid))]
+        (v/limit direction max-force)))))
 
-(defn alignment
-  "An acceleration for a boid representing the way a flock aligns
-  velocities."
-  [boid flock]
-  (let [align-with (nearby boid flock align-distance)]
-    (if (zero? (count align-with))
-      (v/zero (:pos boid))
-      (let [s (reduce v/add (map :vel flock))
-            avg (v/div s (count flock))
-            dir (v/scale avg max-speed)
-            steer (v/sub dir (:vel boid))]
-        (v/limit steer max-force)))))
 
 (defn alignment
   "An acceleration for a boid representing the way a flock aligns
