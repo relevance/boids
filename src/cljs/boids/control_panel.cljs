@@ -58,7 +58,11 @@
   (init-control options-atom :steer-force {:min 0 :max 1 :step 0.02})
   (init-control options-atom :cohere-distance {:min 0 :max 1000})
   (init-control options-atom :avoid-distance {:min 0 :max 500})
-  (init-control options-atom :align-distance {:min 0 :max 1000}))
+  (init-control options-atom :align-distance {:min 0 :max 1000})
+  (init-control options-atom :cohesion-weight {:min 0 :max 2 :step 0.1})
+  (init-control options-atom :avoidance-weight {:min 0 :max 2 :step 0.1})
+  (init-control options-atom :alignment-weight {:min 0 :max 2 :step 0.1})
+  (init-control options-atom :goal-weight {:min 0 :max 2 :step 0.1}))
 
 (defn init-mouse
   "Initialize keeping track of the mouse, updating the goal to its

@@ -2,7 +2,7 @@
   (:require [boids.euclidean-vector :as v]
             [boids.view :as view]
             [boids.control-panel :as cp]
-            [boids.behaviors :as behaviors]))
+            [boids.behaviors :as b]))
 
 ;; A boid consists of a position and a velocity (both EuclideanVectors)
 (defrecord Boid [pos vel])
@@ -14,6 +14,10 @@
                       :cohere-distance 300
                       :avoid-distance 50
                       :align-distance 200
+                      :cohesion-weight 1
+                      :avoidance-weight 1
+                      :alignment-weight 1
+                      :goal-weight 1
                       :goal [(/ (.-innerWidth js/window) 2)
                              (/ (.-innerHeight js/window) 2)]})
 
@@ -24,20 +28,21 @@
                     (rand-int (.-innerHeight js/window))]
               :vel [0 0]}))
 
-;; Behaviors and weights
-(def behaviors { behaviors/cohesion  1
-                 behaviors/avoidance 1
-                 behaviors/alignment 1
-                 behaviors/goal      1 })
+;; A map of behavior functions to the option key used to weight it
+(def behaviors {b/cohesion :cohesion-weight
+                b/avoidance :avoidance-weight
+                b/alignment :alignment-weight
+                b/goal :goal-weight})
 
 (defn update-boid
   "Given a collection containing the flock and an individual boid,
   return an updated boid, using the provided options atom."
   [options-atom boid flock]
-  (let [accelerations (map (fn [[behavior weight]]
-                             (v/mul (behavior @options-atom boid flock) weight))
+  (let [cohestion (b/cohesion @options-atom boid flock)
+        accelerations (map (fn [[behavior weight-key]]
+                             (v/mul (behavior @options-atom boid flock) (@options-atom weight-key)))
                            behaviors)
-        velocity (v/limit (reduce v/add (:vel boid) accelerations) behaviors/max-speed)]
+        velocity (v/limit (reduce v/add (:vel boid) accelerations) (:max-speed @options-atom))]
     {:pos (v/add (:pos boid) velocity)
      :vel velocity}))
 
