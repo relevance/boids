@@ -1,5 +1,6 @@
 (ns boids.behaviors
-  (:require [boids.euclidean-vector :as v]))
+  (:require [boids.euclidean-vector :as v]
+            [boids.euclidean-vector.impl :as vimpl]))
 
 (defn seek
   "Return a vector pointing from the source to the target, limited by
@@ -20,7 +21,7 @@
   [options boid flock]
   (let [cohere-with (nearby boid flock (:cohere-distance options))]
     (if (zero? (count cohere-with))
-      (v/zero (:pos boid))
+      (v/mul (:pos boid) 0)
       (let [center (v/div (reduce v/add (map :pos cohere-with))
                           (count cohere-with))]
         (seek options (:pos boid) center)))))
@@ -31,12 +32,12 @@
   [options boid flock]
   (let [avoid (nearby boid flock (:avoid-distance options))]
     (if (zero? (count avoid))
-      (v/zero (:pos boid))
+      (v/mul (:pos boid) 0)
       (let [direction (reduce (fn [steer pos]
                                 (-> (v/sub (:pos boid) pos)
                                     (v/scale 1)
                                     (v/add steer)))
-                              (v/zero (:pos boid))
+                              (v/mul (:pos boid) 0)
                               (map :pos avoid))]
         (v/limit direction (:steer-force options))))))
 
@@ -46,7 +47,7 @@
   [options boid flock]
   (let [align-with (nearby boid flock (:align-distance options))]
     (if (zero? (count align-with))
-      (v/zero (:pos boid))
+      (v/mul (:pos boid) 0)
       (let [s (reduce v/add (map :vel flock))
             avg (v/div s (count flock))
             dir (v/scale avg (:max-speed options))

@@ -1,6 +1,7 @@
 (ns boids.main
   (:require [boids.euclidean-vector :as v]
             [boids.view :as view]
+            [boids.control-panel :as cp]
             [boids.behaviors :as behaviors]))
 
 ;; A boid consists of a position and a velocity (both EuclideanVectors)
@@ -67,6 +68,7 @@
   []
   (let [options-atom (atom default-options)
         flock-atom (atom (repeatedly num-boids #(create-boid)))]
+    (cp/init options-atom flock-atom)
     (view/init flock-atom)
     (tick options-atom flock-atom)))
 

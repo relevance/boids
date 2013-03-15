@@ -1,27 +1,5 @@
 (ns boids.view)
 
-(defn update-fps
-  [div frame-count]
-  (set! (.-innerHTML div) @frame-count)
-  (reset! frame-count 0))
-
-(defn init-fps-monitor
-  "Create and maintain a FPS indicator that counts how often the the
-  boids atom updates."
-  [boids]
-  (let [frame-count (atom 0)
-        div (.createElement js/document "div")
-        style (.-style div)]
-    (set! (.-color style) "white")
-    (set! (.-backgroundColor style) "black")
-    (set! (.-zIndex style) 1)
-    (set! (.-position style) "absolute")
-    (set! (.-top style) 0)
-    (set! (.-left style) 0)
-    (.appendChild (.-body js/document) div)
-    (add-watch boids :framecounter #(swap! frame-count inc))
-    (.setInterval js/window #(update-fps div frame-count) 1000)))
-
 (defn draw-boid
   "Draws a boid aligned with the positive X axis."
   [ctx]
@@ -62,5 +40,4 @@
     (.setAttribute canvas "height" (.-innerHeight js/window))
     (.appendChild (.-body js/document) canvas)
     (add-watch flock-atom :renderer (fn [_ _ _ flock]
-                                      (render canvas flock)))
-    (init-fps-monitor flock-atom)))
+                                      (render canvas flock)))))

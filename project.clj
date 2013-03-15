@@ -5,7 +5,7 @@
   :source-paths ["src/clj"]
   :main boids.server
   :plugins [[lein-cljsbuild "0.3.0"]]
-  :cljsbuild {:crossovers [boids.behaviors]
+  :cljsbuild {:crossovers [boids.euclidean-vector boids.behaviors]
               :builds [{:source-paths ["src/cljs"]
                         :compiler {:optimizations :none
                                    :output-to "resources/public/build/deps.js"
