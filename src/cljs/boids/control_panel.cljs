@@ -60,6 +60,15 @@
   (init-control options-atom :avoid-distance {:min 0 :max 500})
   (init-control options-atom :align-distance {:min 0 :max 1000}))
 
+(defn init-mouse
+  "Initialize keeping track of the mouse, updating the goal to its
+  current position."
+  [options-atom]
+  (.on (js/jQuery "body") "mousemove"
+       (fn [evt]
+         (swap! options-atom assoc :goal [(.-pageX evt)
+                                          (.-pageY evt)]))))
+
 (defn create-cp
   "Creates and returns a jQuery element for the control panel"
   []
@@ -69,12 +78,12 @@
       (.css "top" 0)
       (.css "left" 0)
       (.css "width" 200)
-      (.appendTo "body"))
-)
+      (.appendTo "body")))
 
 (defn init
   "Initialize the control panel"
   [options-atom flock-atom]
   (create-cp)
   (init-fps-monitor flock-atom)
-  (init-controls options-atom))
+  (init-controls options-atom)
+  (init-mouse options-atom))
