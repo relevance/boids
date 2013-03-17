@@ -3,22 +3,23 @@
             [boids.euclidean-vector.impl :as vimpl]))
 
 (defn seek
-  "Return a vector pointing from the source to the target, limited by
-  the maximum force"
+  "Helper function to return a vector pointing from the source to the
+  target, limited by the maximum force"
   [options source target]
   (v/limit (v/sub target source) (:steer-force options)))
 
 (defn nearby
-  "Given a boid and a flock, return a collection of the boids within a
-  certain distance of the boid, not including the boid itself."
+  "Helper function. Given a boid and a flock, return a collection of
+  the boids within a certain distance of the boid, not including the
+  boid itself."
   [boid flock dist]
   (filter #(and (< (v/distance (:pos %) (:pos boid)) dist)
                 (not= % boid)) flock))
 
 (defn cohesion
-  "Returns an acceleration EuclideanVector for a boid representing
-  flock cohesion, using a given options map."
-  [options boid flock]
+  "Behavior function that returns an acceleration EuclideanVector for
+  a boid representing flock cohesion, using a given options map."
+  [options flock boid]
   (let [cohere-with (nearby boid flock (:cohere-distance options))]
     (if (zero? (count cohere-with))
       (v/mul (:pos boid) 0)
@@ -27,9 +28,10 @@
         (seek options (:pos boid) center)))))
 
 (defn avoidance
-  "Returns an acceleration EuclideanVector for a boid representing
-  avoidance of neighbors, using the given options map."
-  [options boid flock]
+  "Behavior function that returns an acceleration EuclideanVector for
+  a boid representing avoidance of neighbors, using the given options
+  map."
+  [options flock boid]
   (let [avoid (nearby boid flock (:avoid-distance options))]
     (if (zero? (count avoid))
       (v/mul (:pos boid) 0)
@@ -42,9 +44,10 @@
         (v/limit direction (:steer-force options))))))
 
 (defn alignment
-  "Returns an acceleration EuclideanVector for a boid representing the
-  way a flock aligns velocities, using the given options map"
-  [options boid flock]
+  "Behavior function that returns an acceleration EuclideanVector for
+  a boid representing the way a flock aligns velocities, using the
+  given options map"
+  [options flock boid]
   (let [align-with (nearby boid flock (:align-distance options))]
     (if (zero? (count align-with))
       (v/mul (:pos boid) 0)
@@ -55,7 +58,7 @@
         (v/limit steer (:steer-force options))))))
 
 (defn goal
-  "Returns an acceleration EuclideanVector towards a specific point,
+  "Behavior function that returns an acceleration EuclideanVector towards a specific point,
   using the given options map."
-  [options boid flock]
+  [options flock boid]
   (seek options (:pos boid) (:goal options)))
