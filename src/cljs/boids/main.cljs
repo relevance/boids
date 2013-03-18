@@ -7,7 +7,7 @@
 ;; A boid consists of a position and a velocity (both EuclideanVectors)
 (defrecord Boid [pos vel])
 
-(def num-boids 10)
+(def num-boids 30)
 
 (def default-options {:steer-force 0.1
                       :max-speed 6
@@ -40,14 +40,22 @@
                      (options option-weight-key))))
        (reduce v/add)))
 
+(defn wrap
+  "Ensure that the boids never leave the screen"
+  [[x y]]
+  (let [w (.-innerWidth js/window)
+        h (.-innerHeight js/window)]
+    [(mod x w) (mod y h)]))
+
 (defn update-boid
   "Given a collection containing the flock and an individual boid,
   return an updated boid, using the provided options."
   [options flock boid]
   (let [desired-velocity (v/add (:vel boid) (acceleration options flock boid))
-        velocity (v/limit desired-velocity (:max-speed options))]
+        velocity (v/limit desired-velocity (:max-speed options))
+        position (v/add (:pos boid) velocity)]
     (assoc boid
-      :pos (v/add (:pos boid) velocity)
+      :pos (wrap position)
       :vel velocity)))
 
 (defn update-flock
@@ -74,7 +82,7 @@
   (swap! flock-atom (partial update-flock @options-atom))
   (requestAnimationFrame #(tick options-atom flock-atom)))
 
-(defn main
+(defn ^:export main
   "Starts everything running"
   []
   (let [options-atom (atom default-options)
@@ -82,4 +90,5 @@
     (cp/init options-atom flock-atom)
     (view/init flock-atom)
     (tick options-atom flock-atom)))
+
 

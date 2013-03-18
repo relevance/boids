@@ -1,4 +1,7 @@
-  (ns boids.brepl
-    (:require [clojure.browser.repl :as repl]))
+(ns boids.brepl
+  (:require [clojure.browser.repl :as repl]))
 
-  (repl/connect "http://localhost:9000/repl")
+(defn connect-repl
+  "Connects the browser REPL"
+  []
+  (repl/connect "http://localhost:9000/repl"))

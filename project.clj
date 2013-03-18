@@ -9,4 +9,9 @@
               :builds [{:source-paths ["src/cljs"]
                         :compiler {:optimizations :none
                                    :output-to "resources/public/build/deps.js"
-                                   :output-dir "resources/public/build"}}]})
+                                   :output-dir "resources/public/build"}}
+                       {:source-paths ["src/cljs"]
+                        :compiler {:optimizations :advanced
+                                   :externs ["resources/public/lib/jquery-externs.js"]
+                                   :output-to "resources/public/build/advanced.js"}}]})
+
