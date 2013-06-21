@@ -7,7 +7,7 @@
 ;; A boid consists of a position and a velocity (both EuclideanVectors)
 (defrecord Boid [pos vel])
 
-(def num-boids 30)
+(def num-boids 10)
 
 (def default-options {:steer-force 0.1
                       :max-speed 6
