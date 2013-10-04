@@ -13,6 +13,7 @@
                                    :output-dir "resources/public/build"}}
                        {:source-paths ["src/cljs"]
                         :compiler {:optimizations :advanced
+                                   :pretty-print false
                                    :externs ["resources/public/lib/jquery-externs.js"]
                                    :output-to "resources/public/build/advanced.js"}}]})
 
